@@ -82,11 +82,11 @@ const grabSystemsPage = async () => {
 async function main() {
   const connection = await createConnection()
 
-  const res = await connection.manager.getRepository(User).find()
+  // const res = await connection.manager.getRepository(User).find()
 
-  console.log(res)
+  // console.log(res)
 
-  // grabSystemsPage()
+  grabSystemsPage()
 }
 
 main().catch(console.error)
