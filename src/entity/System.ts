@@ -7,6 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
+import { SystemType } from './SystemType'
 
 @Entity()
 export class System {
@@ -16,9 +17,12 @@ export class System {
   @Column()
   name: string
 
-  @ManyToOne(() => Company, (company) => company.systems)
-  company: Company
+  @ManyToOne(() => SystemType, (type) => type.systems)
+  type: SystemType
 
   @OneToMany(() => Game, (game) => game.system)
   games: Game[]
+
+  @ManyToOne(() => Company, (company) => company.systems)
+  company: Company
 }
