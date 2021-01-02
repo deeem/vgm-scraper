@@ -107,17 +107,17 @@ const preloadSystemTypeByName = async (connection, name) => {
   return systemTypeRepository.create({ name })
 }
 
-// const preloadTypeByName = async (connection, name) => {
-//   const systemTypeRepository = connection.getRepository(SystemType)
+const preloadCompanyByName = async (connection, name) => {
+  const companyRepository = connection.getRepository(Company)
 
-//   const found = await systemTypeRepository.findOne({ name })
+  const found = await companyRepository.findOne({ name })
 
-//   if (found) {
-//     return found
-//   }
+  if (found) {
+    return found
+  }
 
-//   return systemTypeRepository.create({ name })
-// }
+  return companyRepository.create({ name })
+}
 
 async function main() {
   const connection = await createConnection()
@@ -126,40 +126,21 @@ async function main() {
   const systemRepository = connection.getRepository(System)
   const companyRepository = connection.getRepository(Company)
 
-  // const res = await connection.manager.getRepository(User).find()
-
-  // console.log(res)
-
   const systemsOnPage = await grabSystemsPage()
   console.log('-->', systemsOnPage)
 
-  return
-
   for (const systemInfo of systemsOnPage) {
-    await storeCompany(connection, systemInfo.company)
+    const company = await preloadCompanyByName(connection, systemInfo.company)
+    const type = await preloadSystemTypeByName(connection, systemInfo.type)
+
+    const system = systemRepository.create({
+      name: systemInfo.name,
+      company,
+      type,
+    })
+
+    await systemRepository.save(system)
   }
-
-  // await systemsOnPage.forEach(async (systemInfo) => {
-  //   await storeCompany(connection, systemInfo.company)
-
-  //   // const company = new Company()
-  //   // company.name = systemInfo.company
-  //   // companyRepository.save(company)
-
-  //   // const systemType = new SystemType()
-  //   // systemType.name = systemInfo.type
-
-  //   // const system = new System()
-  //   // system.name = systemInfo.name
-  //   // system.type = systemType
-  //   // systemRepository.save(system)
-  // })
-
-  // await hardwareRepository.save(newHardware)
-
-  // await systemsOnPage.forEach( async (systemInfo) => {
-  //   await
-  // })
 }
 
 main().catch(console.error)

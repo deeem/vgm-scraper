@@ -17,12 +17,16 @@ export class System {
   @Column()
   name: string
 
-  @ManyToOne(() => SystemType, (type) => type.systems)
+  @ManyToOne(() => SystemType, (type) => type.systems, {
+    cascade: true,
+  })
   type: SystemType
 
   @OneToMany(() => Game, (game) => game.system)
   games: Game[]
 
-  @ManyToOne(() => Company, (company) => company.systems)
+  @ManyToOne(() => Company, (company) => company.systems, {
+    cascade: true,
+  })
   company: Company
 }

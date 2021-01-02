@@ -9,8 +9,6 @@ export class SystemType {
   @Column()
   name: string
 
-  @OneToMany(() => System, (system) => system.type, {
-    cascade: true,
-  })
+  @OneToMany(() => System, (system) => system.type)
   systems: System[]
 }

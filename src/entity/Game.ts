@@ -9,6 +9,12 @@ export class Game {
   @Column()
   name: string
 
+  @Column()
+  developer: string
+
+  @Column()
+  released_at: string
+
   @ManyToOne(() => System, (system) => system.games)
   system: System
 }
