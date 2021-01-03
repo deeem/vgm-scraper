@@ -15,6 +15,8 @@
       "typeorm": "0.2.29"
    },
    "scripts": {
-      "start": "ts-node src/index.ts"
+      "start": "ts-node src/index.ts",
+      "meta": "ts-node src/meta.ts",
+      "grab": "ts-node src/grab.ts"
    }
 }
