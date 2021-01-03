@@ -17,15 +17,14 @@ export class Game {
   name: string
 
   @Column()
-  released_at: string
-
-  @Column()
   packUrl: string
 
   @Column()
   imageUrl: string
 
-  @Column()
+  @Column({
+    default: 'false',
+  })
   isDone: string
 
   @ManyToOne(() => System, (system) => system.games)

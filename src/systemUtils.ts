@@ -1,5 +1,5 @@
 import cheerioModule = require('cheerio')
-import { fetchHtml } from '../fetchHtml'
+import { fetchHtml } from './fetchHtml'
 
 const extractInfoFromSystemItem = (element, $) => {
   const $item = $(element)
