@@ -10,12 +10,30 @@ async function downloadPack(url) {
   await get(url, { directory: `./files/${systemSlug}/`, filename: fileName })
 }
 
+async function downloadImg(url) {
+  const parts = decodeURI(url).split('/')
+  const fileName = parts.pop()
+  const systemSlug = parts.pop()
+
+  const newUrl = `https://vgmrips.net/files/${systemSlug}/${fileName}`
+
+  await get(newUrl, {
+    directory: `./files/${systemSlug}/`,
+    filename: fileName,
+  })
+}
+
 async function main() {
   const connection = await createConnection()
 
   const gameRepository = connection.getRepository(Game)
 
-  //   const firstGame = await gameRepository.findOne(1)
+  const firstGame = await gameRepository.findOne(1)
+
+  await downloadImg(firstGame.imageUrl)
+  console.log(firstGame)
+
+  return
 
   const games = await gameRepository.find()
 
