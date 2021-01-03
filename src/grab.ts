@@ -1,28 +1,13 @@
 import { createConnection } from 'typeorm'
 import { Game } from './entity/Game'
-const https = require('https')
-const fs = require('fs')
+const get = require('async-get-file')
 
-function download(url, name, callback) {
-  const file = fs.createWriteStream(name)
-  const request = https.get(url, function (response) {
-    response.pipe(file)
-
-    if (response.statusCode !== 200) {
-      console.log(`failed to download: ${name}`)
-    }
-  })
-}
-
-async function downloadPack(url, callback) {
+async function downloadPack(url) {
   const parts = decodeURI(url).split('/')
   const fileName = parts.pop()
   const systemSlug = parts.pop()
-  const path = `./files/${systemSlug}/${fileName}`
 
-  download(url, path, callback)
-
-  console.log('~~', path)
+  await get(url, { directory: `./files/${systemSlug}/`, filename: fileName })
 }
 
 async function main() {
@@ -30,15 +15,14 @@ async function main() {
 
   const gameRepository = connection.getRepository(Game)
 
-  const firstGame = await gameRepository.findOne(1)
+  //   const firstGame = await gameRepository.findOne(1)
 
-  downloadPack(firstGame.packUrl, () => {})
+  const games = await gameRepository.find()
 
-  //   download(firstGame.packUrl, 'fasldf.zip', () => {
-  //     console.log('done')
-  //   })
-
-  console.log('-')
+  for (const game of games) {
+    console.log(`pack: #${game.id} of ${games.length} - ${game.name}`)
+    await downloadPack(game.packUrl)
+  }
 }
 
 main().catch(console.error)
