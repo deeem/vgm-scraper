@@ -7,7 +7,7 @@ async function downloadPack(url) {
   const fileName = parts.pop()
   const systemSlug = parts.pop()
 
-  await get(url, { directory: `./files/${systemSlug}/`, filename: fileName })
+  await get(url, { directory: `./files/`, filename: fileName })
 }
 
 async function downloadImg(url) {
@@ -18,7 +18,7 @@ async function downloadImg(url) {
   const newUrl = `https://vgmrips.net/files/${systemSlug}/${fileName}`
 
   await get(newUrl, {
-    directory: `./files/${systemSlug}/`,
+    directory: `./files/`,
     filename: fileName,
   })
 }
@@ -28,18 +28,28 @@ async function main() {
 
   const gameRepository = connection.getRepository(Game)
 
-  const firstGame = await gameRepository.findOne(1)
-
-  await downloadImg(firstGame.imageUrl)
-  console.log(firstGame)
-
-  return
-
   const games = await gameRepository.find()
 
   for (const game of games) {
+    if (game.isDone === 'true') continue
+
     console.log(`pack: #${game.id} of ${games.length} - ${game.name}`)
-    await downloadPack(game.packUrl)
+    try {
+      await downloadPack(game.packUrl)
+
+      game.isDone = 'true'
+      await gameRepository.save(game)
+    } catch (e) {
+      console.log(`pack error: ${game.name}`)
+      console.error(e)
+    }
+
+    try {
+      await downloadImg(game.imageUrl)
+    } catch (e) {
+      console.log(`image error: ${game.name}`)
+      console.error(e)
+    }
   }
 }
 
