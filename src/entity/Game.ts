@@ -1,5 +1,12 @@
 import { System } from './System'
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm'
+import { Track } from './Track'
 
 @Entity()
 export class Game {
@@ -10,11 +17,20 @@ export class Game {
   name: string
 
   @Column()
-  developer: string
+  released_at: string
 
   @Column()
-  released_at: string
+  packUrl: string
+
+  @Column()
+  imageUrl: string
+
+  @Column()
+  isDone: string
 
   @ManyToOne(() => System, (system) => system.games)
   system: System
+
+  @ManyToMany(() => Track, (track) => track.games)
+  tracks: Track[]
 }

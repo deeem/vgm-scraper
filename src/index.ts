@@ -1,146 +1,81 @@
-import axios from 'axios'
-import cheerioModule = require('cheerio')
 import 'reflect-metadata'
-import { createConnection } from 'typeorm'
-import { Company } from './entity/Company'
-
+import { createConnection, Exclusion } from 'typeorm'
+import { grabSystemsPage } from './systemUtils'
 import { System } from './entity/System'
-import { SystemType } from './entity/SystemType'
+import cheerioModule = require('cheerio')
+import { fetchHtml } from '../fetchHtml'
 
-const companiesUrl = 'https://vgmrips.net/packs/companies'
-const systemsUrl = 'https://vgmrips.net/packs/systems'
+const systemUrl = 'https://vgmrips.net/packs/system/nintendo/family-computer'
+// const systemUrl = 'https://vgmrips.net/packs/system/taito/fx-1a'
 
-/*
-createConnection()
-  .then(async (connection) => {
-    return
-
-    console.log('Inserting a new user into the database...')
-    const user = new User()
-    user.firstName = 'Timber'
-    user.lastName = 'Saw'
-    user.age = 25
-    await connection.manager.save(user)
-    console.log('Saved a new user with id: ' + user.id)
-
-    console.log('Loading users from the database...')
-    const users = await connection.manager.find(User)
-    console.log('Loaded users: ', users)
-
-    console.log('Here you can setup and run express/koa/any other framework.')
-  })
-  .catch((error) => console.log(error))
-
-*/
-
-const fetchHtml = async (url) => {
-  try {
-    const { data } = await axios.get(url)
-
-    return data
-  } catch {
-    console.log(`ERROR: while trying to fetch ${url}`)
-  }
-}
-
-const extractInfoFromSystemItem = (element, $) => {
-  const $item = $(element)
-
-  const name = $item.find('.name a').text()
-  const url = $item.find('.name a').attr('href')
-
-  const [type, company] = $item
-    .find('.cat')
-    .text()
-    .trim()
-    .split('•')
-    .map((item) => item.trim())
+function extractGameInfo(game, $) {
+  const imageUrl = $(game).find('.image img').attr('src')
+  const name = $(game).find('.details a').eq(1).text()
+  const url = $(game).find('.details a').eq(1).attr('href')
+  const packUrl = $(game).find('.details a').eq(2).attr('href')
 
   return {
     name,
     url,
-    type,
-    company,
+    imageUrl,
+    packUrl,
   }
 }
 
-const grabSystemsPage = async () => {
-  const html = await fetchHtml(systemsUrl)
+async function grabGamesMetas(systemUrl) {
+  const html = await fetchHtml(systemUrl)
+
   const $ = cheerioModule.load(html)
 
-  let systemsOnPage = []
+  const $paginator = $('nav > div > ul.pagination').last().find('li')
 
-  const $systems = $('#systems').find('.system')
+  const pages =
+    $paginator.length > 3
+      ? parseInt($paginator.eq($paginator.length - 2).text(), 10)
+      : 1
 
-  $systems.each((i, element) => {
-    const system = extractInfoFromSystemItem(element, $)
+  for (let page = 0; page < pages; page++) {
+    let url = `${systemUrl}?p=${page}`
 
-    systemsOnPage = [...systemsOnPage, system]
+    let pageHtml = await fetchHtml(url)
+    let $page = cheerioModule.load(pageHtml)
 
-    // console.log(system)
-  })
+    let $games = $page('.result')
 
-  return systemsOnPage
-}
+    $games.each((i, game) => {
+      console.log('--------------------------------------------')
 
-const storeCompany = async (connection, name) => {
-  const companyRepository = connection.getRepository(Company)
+      // console.log($(game).text())
 
-  const found = await companyRepository.findOne({ where: { name } })
+      console.log(extractGameInfo(game, $))
+    })
 
-  if (found) return
+    // console.log('game', $games)
 
-  const company = companyRepository.create({ name })
-
-  await companyRepository.save(company)
-}
-
-const preloadSystemTypeByName = async (connection, name) => {
-  const systemTypeRepository = connection.getRepository(SystemType)
-
-  const found = await systemTypeRepository.findOne({ name })
-
-  if (found) {
-    return found
+    throw 'asdf'
   }
-
-  return systemTypeRepository.create({ name })
-}
-
-const preloadCompanyByName = async (connection, name) => {
-  const companyRepository = connection.getRepository(Company)
-
-  const found = await companyRepository.findOne({ name })
-
-  if (found) {
-    return found
-  }
-
-  return companyRepository.create({ name })
 }
 
 async function main() {
+  /*
   const connection = await createConnection()
-
-  const SystemTypeRepository = connection.getRepository(SystemType)
   const systemRepository = connection.getRepository(System)
-  const companyRepository = connection.getRepository(Company)
 
-  const systemsOnPage = await grabSystemsPage()
-  console.log('-->', systemsOnPage)
+  const fetchedSystems = await grabSystemsPage()
 
-  for (const systemInfo of systemsOnPage) {
-    const company = await preloadCompanyByName(connection, systemInfo.company)
-    const type = await preloadSystemTypeByName(connection, systemInfo.type)
-
+  for (const systemInfo of fetchedSystems) {
     const system = systemRepository.create({
       name: systemInfo.name,
-      company,
-      type,
+      url: systemInfo.url,
     })
 
-    await systemRepository.save(system)
+    // await systemRepository.save(system)
   }
+
+  // console.log('-->', fetchedSystems)
+ */
+
+  await grabGamesMetas(systemUrl)
 }
 
 main().catch(console.error)

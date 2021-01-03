@@ -1,4 +1,3 @@
-import { Company } from './Company'
 import { Game } from './Game'
 import {
   Column,
@@ -7,7 +6,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { SystemType } from './SystemType'
 
 @Entity()
 export class System {
@@ -17,16 +15,9 @@ export class System {
   @Column()
   name: string
 
-  @ManyToOne(() => SystemType, (type) => type.systems, {
-    cascade: true,
-  })
-  type: SystemType
+  @Column()
+  url: string
 
   @OneToMany(() => Game, (game) => game.system)
   games: Game[]
-
-  @ManyToOne(() => Company, (company) => company.systems, {
-    cascade: true,
-  })
-  company: Company
 }
