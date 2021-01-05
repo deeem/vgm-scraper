@@ -16,7 +16,7 @@ async function main() {
     try {
       await get(game.packUrl, {
         directory: `./vgmrips/`,
-        filename: game.packUrl.split('/').pop(),
+        filename: decodeURI(game.packUrl).split('/').pop(),
       })
 
       game.isDone = 'true'
