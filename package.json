@@ -19,6 +19,7 @@
    "scripts": {
       "start": "ts-node src/index.ts",
       "meta": "ts-node src/meta.ts",
-      "grab": "ts-node src/grab.ts"
+      "grab": "ts-node src/grab.ts",
+      "json": "ts-node src/json.ts"
    }
 }

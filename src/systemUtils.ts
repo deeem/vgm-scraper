@@ -34,8 +34,6 @@ const grabSystemsPage = async () => {
     const system = extractInfoFromSystemItem(element, $)
 
     systemsOnPage = [...systemsOnPage, system]
-
-    // console.log(system)
   })
 
   return systemsOnPage

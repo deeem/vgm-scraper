@@ -1,11 +1,5 @@
 import { Game } from './Game'
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm'
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity()
 export class System {
@@ -14,9 +8,6 @@ export class System {
 
   @Column()
   name: string
-
-  @Column()
-  url: string
 
   @OneToMany(() => Game, (game) => game.system)
   games: Game[]
