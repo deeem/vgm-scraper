@@ -12,7 +12,7 @@ async function main() {
   for (const game of games) {
     if (game.isDone === 'true') continue
 
-    console.log(`pack: #${game.id} of ${games.length} - ${game.name}`)
+    console.log(`#${game.id} of ${games.length} - ${game.name}`)
     try {
       await get(game.packUrl, {
         directory: `./vgmrips/`,
